@@ -9,7 +9,13 @@ import scipy.stats as stats
 from IPython.display import display
 
 class EDA(BaseEstimator, TransformerMixin):
-    """This class will be used to perform EDA on a given dataset, and calculate feature importance using
+    
+    
+    
+    """
+    Developer: jaybshankar@yahoo.com
+    
+    This class will be used to perform EDA on a given dataset, and calculate feature importance using
     One-way ANOVA : For categorical target and numerical feature, remember A large F ratio means that the 
     variation among groups means more than you'd expect to see by chance.
     
@@ -82,6 +88,7 @@ class EDA(BaseEstimator, TransformerMixin):
                     print(f"{cols} is having all distinct values")    
                 else:
                     self._univariate_categorical(column_name = cols)
+                    print(f"univeriate categorical analysis completed for column: {cols}")
                     if self.target_col:
                         self._biveriate_categorical(cols,self.target_col)
             
@@ -89,11 +96,13 @@ class EDA(BaseEstimator, TransformerMixin):
             ### if current column is numerical
             elif (self.df[cols].dtype == float) |(self.df[cols].dtype == int):
                 self._univariate_numerical(column_name=cols)
+                print(f"univeriate numerical analysis completed for column: {cols}")
                 if self.target_col:
                     self._biveriate_categorical(cols,self.target_col)
-                    
-        self._correlation_testing()
-        self._conv_results_to_df()
+        
+        if self.target_col:         
+            self._correlation_testing()
+            self._conv_results_to_df()
         
     def _dataset_statistics(self):
         print ('\033[1m' + 'Calculating Dataset Statistics' +'\033[0m')
@@ -208,11 +217,9 @@ class EDA(BaseEstimator, TransformerMixin):
         if len(corr_d)>0:
             self.corr_df =pd.DataFrame(corr_d).T  
             
-    def _conv_results_to_df(self):
-        self.univariate_numerical_df = pd.DataFrame(self.univariate_numerical_results).T
-        self.univariate_categorical_df = pd.DataFrame(self.univariate_categorical_results).T
-        self.anova_scores_df = pd.DataFrame(self.biveriate_anova_results,index = ['Anova F ratio']).T.sort_values(by ='Anova F ratio',ascending= False)
-        self.Chi_scores_df = pd.DataFrame(self.biveriate_chi_results,index=['chi-squared scores']).T.sort_values(by ='chi-squared scores',ascending= 0)  
+        
+        
+         
             
     def summary(self):
         print ('\033[1m' + 'Dataset statistics' +'\033[0m',
@@ -229,15 +236,41 @@ class EDA(BaseEstimator, TransformerMixin):
          "Unknown variables:              ",self.Unknown_count,"\n",
         '------------------------------------------------------------------------------------\n\n',
         '\033[1m'+ "Univeriate EDA of Numerical Features"+'\033[0m\n')
-        display(self.univariate_numerical_df)
+        if len(self.univariate_numerical_results)>0:
+            
+            self.univariate_numerical_df = pd.DataFrame(self.univariate_numerical_results).T
+            display(self.univariate_numerical_df)
+        else:
+            print("No Numerical variable Found in the DataFrame/if exist please fix the data types")
+        
         print('\033[1m'+ "Univeriate EDA of Categorical Features"+'\033[0m\n')
-        display(self.univariate_categorical_df)
+        if len(self.univariate_categorical_results)>0:
+            self.univariate_categorical_df = pd.DataFrame(self.univariate_categorical_results).T
+            display(self.univariate_categorical_df)
+        else:
+            print("No Categorical variable Found in the DataFrame/if exist please fix the data types")
+         
         
         print('\033[1m'+ "Bivariate EDA of Categorical Features"+'\033[0m\n',
               '\033[1m'+ "Numerical Features ANOVA Scores"+'\033[0m\n')
-        
-        display(self.anova_scores_df)
+        if len(self.biveriate_anova_results)>0:
+            self.anova_scores_df = pd.DataFrame(self.biveriate_anova_results,index = ['Anova F ratio']).T.sort_values(by ='Anova F ratio',ascending= False)
+            display(self.anova_scores_df)
+        else:
+            print("No Target columns Provided")
+            
+            
+       
         print('\n \033[1m'+ "Categorical Features Chi Square Scores"+'\033[0m\n')
-        display(self.Chi_scores_df)
+        
+        if len(self.biveriate_chi_results)>0:
+            self.Chi_scores_df = pd.DataFrame(self.biveriate_chi_results,index=['chi-squared scores']).T.sort_values(by ='chi-squared scores',ascending= 0) 
+            display(self.Chi_scores_df)
+        else:
+            print("No Target columns Provided")
+        
         print('\n \033[1m'+ "Correltion with target"+'\033[0m\n')
-        display(self.corr_df)
+        if 'self.corr_df' in locals():
+            display(self.corr_df)
+        else:
+            print("No Target columns Provided")
