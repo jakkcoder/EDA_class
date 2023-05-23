@@ -1,0 +1,4 @@
+WARNING:tensorflow:Model was constructed with shape (None, 200, 1) for input KerasTensor(type_spec=TensorSpec(shape=(None, 200, 1), dtype=tf.float32, name='lstm_65_input'), name='lstm_65_input', description="created by layer 'lstm_65_input'"), but it was called on an input with incompatible shape (None, 100, 1).
+ERROR:root:Internal Python error in the inspect module.
+Below is the traceback from this internal error.
+
